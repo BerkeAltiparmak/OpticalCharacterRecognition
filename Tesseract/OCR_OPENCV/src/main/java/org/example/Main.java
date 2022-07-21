@@ -57,7 +57,7 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        // opencv-4.5.1 kullanilmistir.
+        // opencv-4.5.5 kullanilmistir.
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
         new Main();
     }

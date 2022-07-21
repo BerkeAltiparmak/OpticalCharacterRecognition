@@ -2,6 +2,10 @@ package org.example;
 
 import com.google.cloud.vision.v1.*;
 import com.google.protobuf.ByteString;
+import org.opencv.core.Core;
+import org.opencv.core.Mat;
+import org.opencv.core.Point;
+import org.opencv.core.Size;
 
 import java.io.FileInputStream;
 import java.nio.file.Files;
@@ -10,19 +14,41 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.opencv.imgcodecs.Imgcodecs.imread;
+import static org.opencv.imgcodecs.Imgcodecs.imwrite;
+import static org.opencv.imgproc.Imgproc.*;
+
 public class Main {
+    static String SRC_PATH = "src/images/";
+    static String fileName = "example4";
+    static String fileExtension = ".png";
+    static boolean is_processed = false;
     public static void main(String[] args) throws Exception{
-        String filePath = "src/images/example4.png";
+        /*
+        // using opencv-4.5.5 to preprocess the image.
+        System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+        Mat origin = imread(SRC_PATH + fileName + fileExtension);
+        is_processed = process_image_opencv(origin);
+        */
 
         List<AnnotateImageRequest> requests = new ArrayList<>();
 
+        String filePath = SRC_PATH + fileName + fileExtension;
+        if (is_processed) {
+            filePath = SRC_PATH + fileName + "CloseOpen" + fileExtension;
+        }
         ByteString imgBytes = ByteString.readFrom(new FileInputStream(filePath));
 
         Image img = Image.newBuilder().setContent(imgBytes).build();
-        Feature feat = Feature.newBuilder().setType(Feature.Type.TEXT_DETECTION).build();
-        AnnotateImageRequest request =
-                AnnotateImageRequest.newBuilder().addFeatures(feat).setImage(img).build();
-        requests.add(request);
+        Feature textFeat = Feature.newBuilder().setType(Feature.Type.DOCUMENT_TEXT_DETECTION).build();
+        AnnotateImageRequest textRequest =
+                AnnotateImageRequest.newBuilder().addFeatures(textFeat).setImage(img).build();
+        requests.add(textRequest);
+
+        Feature labelFeat = Feature.newBuilder().setType(Feature.Type.LABEL_DETECTION).build();
+        AnnotateImageRequest labelRequest =
+                AnnotateImageRequest.newBuilder().addFeatures(labelFeat).setImage(img).build();
+        requests.add(labelRequest);
 
         // Initialize client that will be used to send requests. This client only needs to be created
         // once, and can be reused for multiple requests. After completing all of your requests, call
@@ -34,36 +60,68 @@ public class Main {
 
             List<WordText> words = new ArrayList<WordText>();
 
+            String imageLabel = "";
+
+            // starting the annotation of the image
+            // full list of available annotations can be found at http://g.co/cloud/vision/docs
             for (AnnotateImageResponse res : responses) {
                 if (res.hasError()) {
                     System.out.format("Error: %s%n", res.getError().getMessage());
                     return;
                 }
 
-                // For full list of available annotations, see http://g.co/cloud/vision/docs
                 for (EntityAnnotation annotation : res.getTextAnnotationsList()) {
                     String text = annotation.getDescription();
                     BoundingPoly boundingPoly = annotation.getBoundingPoly();
 
-                    //System.out.format("Text: %s%n", text);
-                    //System.out.format("Position : %s%n", boundingPoly);
+                    // System.out.format("Text: %s%n", text);
+                    // System.out.format("Position : %s%n", boundingPoly);
 
-                    // everything below is "ordering"
+                    // in order to properly order the words, we put them and their properties to an ArrayList
                     words.add(new WordText(text, boundingPoly));
                 }
+
+                // get the most confident image label when res is regarding Label Response
+                try {
+                    imageLabel = res.getLabelAnnotations(0).getDescription();
+                }
+                catch (Exception ignored) {
+                }
             }
-            System.out.println(words.get(0)); // print the full text
-            System.out.println("!!!NOW THE ORDERED VERSION!!!");
-            words.remove(0); // (skip the first text as it's the full text)
-            String orderedText = getOrderedText(words);
-            System.out.println(orderedText);
+            System.out.println("The image is analyzed to be: " + imageLabel);
+
+            System.out.println("The Original Text: ");
+            System.out.println(words.get(0).getText()); // print the full text
+
+            if (imageLabel.equals("Receipt")) {
+                System.out.println("\n Since this image is analyzed to be a receipt," +
+                        " here is the ordered version of it: ");
+                words.remove(0); // (skip the first text as it's the full text)
+                String orderedText = getOrderedText(words);
+                System.out.println(orderedText);
+            }
+
+
         }
 
+    }
+
+    private static boolean process_image_opencv(Mat inputMat) {
+        Mat gray = new Mat();
+        cvtColor(inputMat, gray, COLOR_BGR2GRAY);
+        imwrite(SRC_PATH + fileName + "Gray" + fileExtension, gray);
+        Mat element = getStructuringElement(MORPH_RECT, new Size(2, 2), new Point(1, 1));
+        dilate(gray, gray, element);
+        erode(gray, gray, element);
+        imwrite(SRC_PATH + fileName + "CloseOpen" + fileExtension, gray);
+        return true;
     }
 
     private static String getOrderedText(List<WordText> words) {
         StringBuilder textSoFar = new StringBuilder();
         List<WordText> removedWords = new ArrayList<WordText>();
+
+        // iterate through every word in the text in the order that GoogleVision captured
         for (WordText word1: words) {
 
             // if the word is already written in the text, don't write it again
@@ -77,6 +135,7 @@ public class Main {
                 removedWords.add(word1);
             }
 
+            // iterate through every other word to compare other word's y-coordinates with word1
             for (WordText word2: words) {
 
                 // if there exists another word that is within the y-coordinate range of this word, add it to the text

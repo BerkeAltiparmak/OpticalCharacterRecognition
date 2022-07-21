@@ -20,7 +20,7 @@
             <version>5.2.1</version>
         </dependency>
 
-        <!-- asagida version 0.18.0 olmasi, opencv-4.5.1 ile calismasını sagliyor. -->
+        <!-- asagida version 0.18.0 olmasi, opencv-4.5.5 ile calismasını sagliyor. -->
         <dependency>
             <groupId>ai.djl.opencv</groupId>
             <artifactId>opencv</artifactId>
