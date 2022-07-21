@@ -30,6 +30,7 @@ public class Main {
         Mat origin = imread(SRC_PATH + fileName + fileExtension);
         is_processed = process_image_opencv(origin);
         */
+        long start = System.currentTimeMillis();
 
         List<AnnotateImageRequest> requests = new ArrayList<>();
 
@@ -99,8 +100,11 @@ public class Main {
                 words.remove(0); // (skip the first text as it's the full text)
                 String orderedText = getOrderedText(words);
                 System.out.println(orderedText);
+
+                ReceiptMaster rm = new ReceiptMaster(orderedText);
             }
 
+            System.out.println("It took: " + (System.currentTimeMillis() - start) + " milliseconds.");
 
         }
 
