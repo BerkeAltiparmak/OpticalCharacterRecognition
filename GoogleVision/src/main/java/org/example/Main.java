@@ -4,45 +4,32 @@ import com.google.cloud.vision.v1.*;
 import com.google.protobuf.ByteString;
 
 import java.io.FileInputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-/*
-import static org.opencv.imgcodecs.Imgcodecs.imread;
-import static org.opencv.imgcodecs.Imgcodecs.imwrite;
-import static org.opencv.imgproc.Imgproc.*;
-import org.opencv.core.Core;
-import org.opencv.core.Mat;
-import org.opencv.core.Point;
-import org.opencv.core.Size; */
 
 public class Main {
     static String SRC_PATH = "src/images/";
-    static String fileName = "example14";
+    static String fileName = "example4";
     static String fileExtension = ".png"; // didn't work with .pdf
     static boolean is_processed = false;
     public static void main(String[] args) throws Exception{
-        /*
-        // using opencv-4.5.5 to preprocess the image.
-        System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-        Mat origin = imread(SRC_PATH + fileName + fileExtension);
-        is_processed = process_image_opencv(origin);
-        */
+
         long start = System.currentTimeMillis();
+
+        // using opencv-4.5.5 to preprocess the image.
+        // ImageProcessor ig = new ImageProcessor(SRC_PATH, fileName, fileExtension);
 
         List<AnnotateImageRequest> requests = new ArrayList<>();
 
         String filePath = SRC_PATH + fileName + fileExtension;
         if (is_processed) {
-            filePath = SRC_PATH + fileName + "CloseOpen" + fileExtension;
+            filePath = SRC_PATH + fileName + "GrayCanny" + fileExtension;
         }
         ByteString imgBytes = ByteString.readFrom(new FileInputStream(filePath));
 
         Image img = Image.newBuilder().setContent(imgBytes).build();
-        Feature textFeat = Feature.newBuilder().setType(Feature.Type.DOCUMENT_TEXT_DETECTION).build();
+        Feature textFeat = Feature.newBuilder().setType(Feature.Type.TEXT_DETECTION).build();
         AnnotateImageRequest textRequest =
                 AnnotateImageRequest.newBuilder().addFeatures(textFeat).setImage(img).build();
         requests.add(textRequest);
@@ -118,17 +105,6 @@ public class Main {
         }
 
     }
-/*
-    private static boolean process_image_opencv(Mat inputMat) {
-        Mat gray = new Mat();
-        cvtColor(inputMat, gray, COLOR_BGR2GRAY);
-        imwrite(SRC_PATH + fileName + "Gray" + fileExtension, gray);
-        Mat element = getStructuringElement(MORPH_RECT, new Size(2, 2), new Point(1, 1));
-        dilate(gray, gray, element);
-        erode(gray, gray, element);
-        imwrite(SRC_PATH + fileName + "CloseOpen" + fileExtension, gray);
-        return true;
-    } */
 
     private static String getOrderedText(List<WordText> words) {
         StringBuilder textSoFar = new StringBuilder();

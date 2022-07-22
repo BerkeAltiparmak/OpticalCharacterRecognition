@@ -1,5 +1,7 @@
 package org.example;
 
+
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -10,6 +12,7 @@ import java.io.IOException;
 import java.util.*;
 
 public class ReceiptMaster {
+    private final double threshold = 0.8;
     public ReceiptMaster(String text) {
         Map<String, String> associatedMap = new HashMap<>();
         associatedMap = getAssociatedCategories(text);
@@ -107,59 +110,63 @@ public class ReceiptMaster {
                 }
 
                 // get belgeNo
-                if (i >= 6) {
-                    if (belgeNoList.contains(tLine.substring(i - 6, i).toUpperCase()
-                            .replaceAll("\\s",""))) {
-                        for (int j = i; j < tLine.length(); j++) {
-                            if (isIntOrAccep(tLine.substring(j, j + 1))) {
-                                if (isInt(tLine.substring(j, j + 1))) {
-                                    belgeNo += tLine.substring(j, j + 1);
+                for (String belgeAlt: belgeNoList) {
+                    if (i >= belgeAlt.length() + 1) { // accounting for the "space" by adding +1
+                        if (belgeAlt.equals(tLine.substring(i - belgeAlt.length() - 1, i).toUpperCase()
+                                .replaceAll("\\s", ""))) {
+                            for (int j = i; j < tLine.length(); j++) {
+                                if (isIntOrAccep(tLine.substring(j, j + 1))) {
+                                    if (isInt(tLine.substring(j, j + 1))) {
+                                        belgeNo += tLine.substring(j, j + 1);
+                                    }
+                                } else {
+                                    break;
                                 }
-                            }
-                            else {
-                                break;
                             }
                         }
                     }
                 }
 
                 // get vergiDairesi and vergiNo
-                if (i >= 3) {
-                    if (vergiList.contains(tLine.substring(i - 3, i))) {
-                        for (int j = i; j < tLine.length(); j++) {
-                            if (isIntOrAccep(tLine.substring(j, j + 1))) {
-                                if (isInt(tLine.substring(j, j + 1))) {
-                                    // get vergiNo, but it might not exist here
-                                    vergiNo += tLine.substring(j, j + 1);
+                for (String vergiAlt: vergiList) {
+                    if (i >= vergiAlt.length()) {
+                        if (findStringSimilarity(vergiAlt, tLine.substring(i - vergiAlt.length(), i)) >= threshold) {
+                            for (int j = i; j < tLine.length(); j++) {
+                                if (isIntOrAccep(tLine.substring(j, j + 1))) {
+                                    if (isInt(tLine.substring(j, j + 1))) {
+                                        // get vergiNo, but it might not exist here
+                                        vergiNo += tLine.substring(j, j + 1);
+                                    }
+                                } else {
+                                    break;
                                 }
                             }
-                            else {
-                                break;
-                            }
-                        }
-                        vergiDairesi = tLine.substring(0, i - 3);
+                            vergiDairesi = tLine.substring(0, i - vergiAlt.length());
 
-                        if (vergiNo.equals("")) {
-                            vergiNo = prevLine;
+                            if (vergiNo.equals("")) {
+                                vergiNo = prevLine;
+                            }
                         }
                     }
                 }
 
                 // get kdv
-                if (i >= 6 && kdv.equals("")) {
-                    if ("TOPKDV".equals(tLine.substring(i - 6, i).toUpperCase())) {
-                        for (int j = i; j < tLine.length(); j++) {
-                            if (isIntOrAccep(tLine.substring(j, j + 1))) {
-                                if (isInt(tLine.substring(j, j + 1))) {
-                                    kdv += tLine.substring(j, j + 1);
-                                }
+                for (String kdvAlt: kdvList) {
+                    if (i >= kdvAlt.length() && kdv.equals("")) {
+                        if (kdvAlt.equals(tLine.substring(i - kdvAlt.length(), i).toUpperCase())) {
+                            for (int j = i; j < tLine.length(); j++) {
+                                if (isIntOrAccep(tLine.substring(j, j + 1))) {
+                                    if (isInt(tLine.substring(j, j + 1))) {
+                                        kdv += tLine.substring(j, j + 1);
+                                    }
 
-                                if (tLine.substring(j, j + 1).equals(",") || tLine.substring(j, j + 1).equals(".")) {
-                                    kdv += '.';
+                                    if (tLine.substring(j, j + 1).equals(",") || tLine.substring(j, j + 1).equals(".")) {
+                                        kdv += '.';
+                                    }
                                 }
-                            }
-                            else {
-                                break;
+                                else {
+                                    break;
+                                }
                             }
                         }
                     }
@@ -167,20 +174,21 @@ public class ReceiptMaster {
 
                 // get toplam
                 // problem: there may be 'ara toplam' issues
-                if (i >= 6 && toplam.equals("")) {
-                    if (toplamList.contains(tLine.substring(i - 6, i).toUpperCase())) {
-                        for (int j = i; j < tLine.length(); j++) {
-                            if (isIntOrAccep(tLine.substring(j, j + 1))) {
-                                if (isInt(tLine.substring(j, j + 1))) {
-                                    toplam += tLine.substring(j, j + 1);
-                                }
+                for (String toplamAlt: toplamList) {
+                    if (i >= toplamAlt.length() && toplam.equals("")) {
+                        if (toplamAlt.equals(tLine.substring(i - toplamAlt.length(), i).toUpperCase())) {
+                            for (int j = i; j < tLine.length(); j++) {
+                                if (isIntOrAccep(tLine.substring(j, j + 1))) {
+                                    if (isInt(tLine.substring(j, j + 1))) {
+                                        toplam += tLine.substring(j, j + 1);
+                                    }
 
-                                if (tLine.substring(j, j + 1).equals(",") || tLine.substring(j, j + 1).equals(".")) {
-                                    toplam += '.';
+                                    if (tLine.substring(j, j + 1).equals(",") || tLine.substring(j, j + 1).equals(".")) {
+                                        toplam += '.';
+                                    }
+                                } else {
+                                    break;
                                 }
-                            }
-                            else {
-                                break;
                             }
                         }
                     }
@@ -237,12 +245,13 @@ public class ReceiptMaster {
         tarihList.add("-2019");tarihList.add("-2020");tarihList.add("-2021");tarihList.add("-2022");tarihList.add("-2023");
 
         belgeNoList.add("FİŞNO");belgeNoList.add("FIŞNO");belgeNoList.add("FISNO");belgeNoList.add("FİSNO");
+        belgeNoList.add("SATIŞNO");belgeNoList.add("SATİŞNO");belgeNoList.add("SATİSNO");belgeNoList.add("SATISNO");
 
-        kdvList.add("TOPKDV");kdvList.add("KDV");
+        kdvList.add("TOPKDV");kdvList.add("TOPLAM KDV");
 
-        toplamList.add("TOPLAM");toplamList.add("TPLM");toplamList.add("TOP");
+        toplamList.add("TOPLAM");toplamList.add("TPLM");
 
-        vergiList.add(" VD");vergiList.add("V.D");
+        vergiList.add(" VD");vergiList.add("V.D");vergiList.add("Vergi Dairesi");
 
         alternatives[0] = tarihList;
         alternatives[1] = belgeNoList;
@@ -271,5 +280,16 @@ public class ReceiptMaster {
             }
         }
         return true;
+    }
+
+    //return similarity between 0 and 1
+    public static double findStringSimilarity(String x, String y) {
+
+        double maxLength = Double.max(x.length(), y.length());
+        if (maxLength > 0) {
+            // not case sensitive
+            return (maxLength - StringUtils.getLevenshteinDistance(x.toUpperCase(), y.toUpperCase())) / maxLength;
+        }
+        return 1.0;
     }
 }
