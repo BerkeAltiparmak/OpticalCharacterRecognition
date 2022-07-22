@@ -32,11 +32,13 @@
         </dependency>
 
         <!-- having version 0.18.0 below lets us use opencv-4.5.5. -->
+        <!--
         <dependency>
             <groupId>ai.djl.opencv</groupId>
             <artifactId>opencv</artifactId>
             <version>0.18.0</version>
         </dependency>
+        -->
 
         <!-- in order to work with Excel files -->
         <dependency>

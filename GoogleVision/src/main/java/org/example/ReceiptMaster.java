@@ -62,7 +62,7 @@ public class ReceiptMaster {
         }
 
 
-        try (FileOutputStream outputStream = new FileOutputStream("src/tables/Vergiler.xlsx")) {
+        try (FileOutputStream outputStream = new FileOutputStream("src/tables/Vergiler14.xlsx")) {
             workbook.write(outputStream);
         }
     }
@@ -97,8 +97,8 @@ public class ReceiptMaster {
             for (int i = 0; i <= tLine.length(); i++) {
 
                 // get tarih
-                if (i >= 4) {
-                    if (tarihList.contains(tLine.substring(i - 4, i))) {
+                if (i >= 5) {
+                    if (tarihList.contains(tLine.substring(i - 5, i))) {
                         try {
                             tarih = tLine.substring(i - 10, i);
                         }
@@ -232,7 +232,9 @@ public class ReceiptMaster {
         List<String> vergiList = new ArrayList<>();
 
         // other things might include these numbers as well (cellphone numbers, vergiNo, etc.)
-        tarihList.add("2019");tarihList.add("2020");tarihList.add("2021");tarihList.add("2022");tarihList.add("2023");
+        tarihList.add("/2019");tarihList.add("/2020");tarihList.add("/2021");tarihList.add("/2022");tarihList.add("/2023");
+        tarihList.add(".2019");tarihList.add(".2020");tarihList.add(".2021");tarihList.add(".2022");tarihList.add(".2023");
+        tarihList.add("-2019");tarihList.add("-2020");tarihList.add("-2021");tarihList.add("-2022");tarihList.add("-2023");
 
         belgeNoList.add("FİŞNO");belgeNoList.add("FIŞNO");belgeNoList.add("FISNO");belgeNoList.add("FİSNO");
 

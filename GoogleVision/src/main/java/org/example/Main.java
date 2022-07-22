@@ -2,10 +2,6 @@ package org.example;
 
 import com.google.cloud.vision.v1.*;
 import com.google.protobuf.ByteString;
-import org.opencv.core.Core;
-import org.opencv.core.Mat;
-import org.opencv.core.Point;
-import org.opencv.core.Size;
 
 import java.io.FileInputStream;
 import java.nio.file.Files;
@@ -14,14 +10,19 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+/*
 import static org.opencv.imgcodecs.Imgcodecs.imread;
 import static org.opencv.imgcodecs.Imgcodecs.imwrite;
 import static org.opencv.imgproc.Imgproc.*;
+import org.opencv.core.Core;
+import org.opencv.core.Mat;
+import org.opencv.core.Point;
+import org.opencv.core.Size; */
 
 public class Main {
     static String SRC_PATH = "src/images/";
-    static String fileName = "example4";
-    static String fileExtension = ".png";
+    static String fileName = "example14";
+    static String fileExtension = ".png"; // didn't work with .pdf
     static boolean is_processed = false;
     public static void main(String[] args) throws Exception{
         /*
@@ -71,6 +72,7 @@ public class Main {
                     return;
                 }
 
+                // get text annotation
                 for (EntityAnnotation annotation : res.getTextAnnotationsList()) {
                     String text = annotation.getDescription();
                     BoundingPoly boundingPoly = annotation.getBoundingPoly();
@@ -80,6 +82,13 @@ public class Main {
 
                     // in order to properly order the words, we put them and their properties to an ArrayList
                     words.add(new WordText(text, boundingPoly));
+                }
+
+                // get label annotation
+                for (EntityAnnotation annotation : res.getLabelAnnotationsList()) {
+                    annotation
+                            .getAllFields()
+                            .forEach((k, v) -> System.out.format("%s : %s%n", k, v.toString()));
                 }
 
                 // get the most confident image label when res is regarding Label Response
@@ -94,7 +103,7 @@ public class Main {
             System.out.println("The Original Text: ");
             System.out.println(words.get(0).getText()); // print the full text
 
-            if (imageLabel.equals("Receipt")) {
+            if ("Receipt".equals(imageLabel) || "Font".equals(imageLabel)) {
                 System.out.println("\n Since this image is analyzed to be a receipt," +
                         " here is the ordered version of it: ");
                 words.remove(0); // (skip the first text as it's the full text)
@@ -109,7 +118,7 @@ public class Main {
         }
 
     }
-
+/*
     private static boolean process_image_opencv(Mat inputMat) {
         Mat gray = new Mat();
         cvtColor(inputMat, gray, COLOR_BGR2GRAY);
@@ -119,7 +128,7 @@ public class Main {
         erode(gray, gray, element);
         imwrite(SRC_PATH + fileName + "CloseOpen" + fileExtension, gray);
         return true;
-    }
+    } */
 
     private static String getOrderedText(List<WordText> words) {
         StringBuilder textSoFar = new StringBuilder();
