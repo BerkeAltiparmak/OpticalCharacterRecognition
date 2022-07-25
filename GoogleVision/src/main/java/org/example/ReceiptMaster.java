@@ -65,7 +65,7 @@ public class ReceiptMaster {
         }
 
 
-        try (FileOutputStream outputStream = new FileOutputStream("src/tables/Vergiler14.xlsx")) {
+        try (FileOutputStream outputStream = new FileOutputStream("src/tables/Vergiler15new.xlsx")) {
             workbook.write(outputStream);
         }
     }
@@ -120,7 +120,8 @@ public class ReceiptMaster {
                                         belgeNo += tLine.substring(j, j + 1);
                                     }
                                 } else {
-                                    break;
+                                    if (!belgeNo.equals(""))
+                                        break;
                                 }
                             }
                         }
@@ -165,7 +166,8 @@ public class ReceiptMaster {
                                     }
                                 }
                                 else {
-                                    break;
+                                    if (!kdv.equals(""))
+                                        break;
                                 }
                             }
                         }
@@ -187,7 +189,8 @@ public class ReceiptMaster {
                                         toplam += '.';
                                     }
                                 } else {
-                                    break;
+                                    if (!toplam.equals(""))
+                                        break;
                                 }
                             }
                         }
@@ -198,16 +201,19 @@ public class ReceiptMaster {
             }
             prevLine = tLine;
         }
-        kdv = kdv.replace(".", "");
-        kdv = kdv.substring(0, kdv.length() - 2) + "." + kdv.substring(kdv.length() - 2);
-        toplam = toplam.replace(".", "");
-        toplam = toplam.substring(0, toplam.length() - 2) + "." + toplam.substring(toplam.length() - 2);
-        tutar = String.valueOf(Integer.parseInt(toplam.replace(".", "")) -
-                Integer.parseInt(kdv.replace(".", "")));
-        tutar = tutar.substring(0, tutar.length() - 2) + "." + tutar.substring(tutar.length() - 2);
+        try {
+            kdv = kdv.replace(".", "");
+            kdv = kdv.substring(0, kdv.length() - 2) + "." + kdv.substring(kdv.length() - 2);
+            toplam = toplam.replace(".", "");
+            toplam = toplam.substring(0, toplam.length() - 2) + "." + toplam.substring(toplam.length() - 2);
+            tutar = String.valueOf(Integer.parseInt(toplam.replace(".", "")) -
+                    Integer.parseInt(kdv.replace(".", "")));
+            tutar = tutar.substring(0, tutar.length() - 2) + "." + tutar.substring(tutar.length() - 2);
 
-        tarih = tarih.replace(".", "/");
-        tarih = tarih.replace("-", "/");
+            tarih = tarih.replace(".", "/");
+            tarih = tarih.replace("-", "/");
+        }
+        catch (Exception ignored) {}
 
         System.out.println("Tarih: " + tarih);
         System.out.println("Belge Adi: " + belgeAdi);

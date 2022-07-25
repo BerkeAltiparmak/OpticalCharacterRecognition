@@ -10,7 +10,7 @@ import java.util.List;
 
 public class Main {
     static String SRC_PATH = "src/images/";
-    static String fileName = "example4";
+    static String fileName = "example15";
     static String fileExtension = ".png"; // didn't work with .pdf
     static boolean is_processed = false;
     public static void main(String[] args) throws Exception{
@@ -29,7 +29,7 @@ public class Main {
         ByteString imgBytes = ByteString.readFrom(new FileInputStream(filePath));
 
         Image img = Image.newBuilder().setContent(imgBytes).build();
-        Feature textFeat = Feature.newBuilder().setType(Feature.Type.TEXT_DETECTION).build();
+        Feature textFeat = Feature.newBuilder().setType(Feature.Type.DOCUMENT_TEXT_DETECTION).build();
         AnnotateImageRequest textRequest =
                 AnnotateImageRequest.newBuilder().addFeatures(textFeat).setImage(img).build();
         requests.add(textRequest);
@@ -43,7 +43,7 @@ public class Main {
         // once, and can be reused for multiple requests. After completing all of your requests, call
         // the "close" method on the client to safely clean up any remaining background resources.
         try (ImageAnnotatorClient client = ImageAnnotatorClient.create()) {
-            BatchAnnotateImagesResponse response = client.batchAnnotateImages(requests);
+            BatchAnnotateImagesResponse response = client.batchAnnotateImages(requests); // where API request is made
             List<AnnotateImageResponse> responses = response.getResponsesList();
             client.close();
 
@@ -66,17 +66,20 @@ public class Main {
 
                     // System.out.format("Text: %s%n", text);
                     // System.out.format("Position : %s%n", boundingPoly);
+                    // System.out.println("Topicality: " + annotation.getTopicality());
 
                     // in order to properly order the words, we put them and their properties to an ArrayList
                     words.add(new WordText(text, boundingPoly));
                 }
 
                 // get label annotation
+                /*
                 for (EntityAnnotation annotation : res.getLabelAnnotationsList()) {
                     annotation
                             .getAllFields()
                             .forEach((k, v) -> System.out.format("%s : %s%n", k, v.toString()));
                 }
+                 */
 
                 // get the most confident image label when res is regarding Label Response
                 try {
@@ -110,35 +113,63 @@ public class Main {
         StringBuilder textSoFar = new StringBuilder();
         List<WordText> removedWords = new ArrayList<WordText>();
 
+
         // iterate through every word in the text in the order that GoogleVision captured
         for (WordText word1: words) {
 
-            // if the word is already written in the text, don't write it again
-            if (!removedWords.contains(word1)) {
+            // if the word is already written in the text or is not in the correct orientation, don't mind it
+            if (!removedWords.contains(word1) && word1.isCounterClockwiseFromTopLeft()) {
 
-                // if it's out of the y-coordinate range of the previous word, make a line break
-                textSoFar.append("\n");
+                // if it's out of the y-coordinate range of the previous word, make a line break,
+                // if it's not the first word
+                if (!textSoFar.toString().equals("")) {
+                    textSoFar.append("\n");
+                }
 
-                // add the word to the text
-                textSoFar.append(word1.getText());
+                // two string builders so that one inner for loop is enough.
+                StringBuilder textBeforeWord1 = new StringBuilder();
+                StringBuilder textAfterWord1 = new StringBuilder();
+                String newWord = word1.getText();
                 removedWords.add(word1);
-            }
 
-            // iterate through every other word to compare other word's y-coordinates with word1
-            for (WordText word2: words) {
+                // iterate through every other word to compare other word's y-coordinates with word1
+                for (WordText word2 : words) {
 
-                // if there exists another word that is within the y-coordinate range of this word, add it to the text
-                if (word2 != word1 && !removedWords.contains(word2)) {
-                    if (word2.getCenterY() >= word1.getY1() && word2.getCenterY() <= word1.getY4()) {
+                    // make sure the word is correctly orientated
+                    if (word2 != word1 && !removedWords.contains(word2) && word2.isCounterClockwiseFromTopLeft()) {
 
-                        // if words are not close to each other, add a space in between
-                        if (word2.getX1() - word1.getX2() > 2) {
-                            textSoFar.append(" ");
+                        // if there exists words above this word that hasn't been added yet,
+                        // add it to the text before word1
+                        if (word2.getCenterY() <= word1.getY1() && word2.getCenterY() <= word1.getY2()) {
+                            textBeforeWord1.append(word2.getText());
+                            removedWords.add(word2);
+                            textBeforeWord1.append(" ");
                         }
-                        textSoFar.append(word2.getText());
-                        removedWords.add(word2);
+
+                        // if there exists another word that is within the y-coordinate range of this word,
+                        // add it to the text after word1
+                        if (word2.getCenterY() >= word1.getY1() && word2.getCenterY() <= word1.getY4()) {
+
+                            // if words are not close to each other, add a space in between
+                            if (word2.getX1() - word1.getX2() > 2) {
+                                textAfterWord1.append(" ");
+                            }
+                            textAfterWord1.append(word2.getText());
+                            removedWords.add(word2);
+
+                            word1 = word2;
+                        }
                     }
                 }
+
+                // combine StringBuilders together to add these new words
+                textSoFar.append(textBeforeWord1);
+                // create an empty line before word1 as we don't want them to be next to each other.
+                if(!textBeforeWord1.toString().equals("")) {
+                    textSoFar.append("\n");
+                }
+                textSoFar.append(newWord);
+                textSoFar.append(textAfterWord1);
             }
         }
 

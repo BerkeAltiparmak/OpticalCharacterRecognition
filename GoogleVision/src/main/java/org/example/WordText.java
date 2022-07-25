@@ -79,4 +79,9 @@ public class WordText {
     public int getY4() {
         return y4;
     }
+
+    public boolean isCounterClockwiseFromTopLeft() {
+        return getX3() > getX1() && getX2() > getX1() &&
+                getY3() > getY1() && getY3() > getY2();
+    }
 }
