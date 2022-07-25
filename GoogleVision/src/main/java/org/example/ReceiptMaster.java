@@ -16,12 +16,14 @@ public class ReceiptMaster {
     public ReceiptMaster(String text) {
         Map<String, String> associatedMap = new HashMap<>();
         associatedMap = getAssociatedCategories(text);
+        /*
         try {
             writeIntoExcelFile(associatedMap);
         }
         catch (IOException ioe) {
             System.out.println("IOException detected");
         }
+         */
     }
 
     private void writeIntoExcelFile(Map<String, String> associatedMap) throws IOException {

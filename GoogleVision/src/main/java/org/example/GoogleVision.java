@@ -84,6 +84,7 @@ public class GoogleVision {
                 words.remove(0); // (skip the first text as it's the full text)
                 orderedText = orderReceiptText(words);
                 System.out.println(orderedText);
+                ReceiptMaster rm = new ReceiptMaster(orderedText);
             }
 
         }

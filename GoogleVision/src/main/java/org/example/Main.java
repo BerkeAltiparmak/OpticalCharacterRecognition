@@ -27,15 +27,25 @@ public class Main {
         }
 
         // read the image with GoogleVision and get the orderedText if it is a receipt
-        GoogleVision gv = new GoogleVision(filePath);
-        String orderedText = gv.getOrderedText();
+        // GoogleVision gv = new GoogleVision(filePath);
+        // String orderedText = gv.getOrderedText();
 
+        Thread vt = new VisionThread(filePath);
+        vt.start();
+        System.out.println("\n \n OYYYY \n \n");
+        fileName = "example4";
+        Thread vt2 = new VisionThread(SRC_PATH + fileName + fileExtension);
+        vt2.start();
+        // String orderedText = vt.getOrderedText();
+/*
         if (!orderedText.equals("")) {
             ReceiptMaster rm = new ReceiptMaster(orderedText);
         }
         else {
             System.out.println("The image is not a receipt");
         }
+
+ */
 
         System.out.println("It took: " + (System.currentTimeMillis() - start) + " milliseconds.");
     }
