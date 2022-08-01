@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.util.*;
 
 public class Tester {
-    static String excelFilePath = "src/tables/Vergilers.xlsx";
+    static String excelFilePath = "src/tables/Vergilerim.xlsx";
     public static void main(String[] args) throws IOException {
         Map<String, String> associatedMap = new HashMap<>();
         associatedMap.put("Tarih", "12/15/2022");

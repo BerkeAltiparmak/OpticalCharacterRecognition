@@ -12,6 +12,8 @@ public class Main {
     static String sourcePath = "src/images/";
     static String fileName = "example15";
     static String fileExtension = ".png"; // didn't work with .pdf
+    private static String excelFilePath = "src/tables/VergilerOldMethod.xlsx";
+
     public static void main(String[] args) throws Exception {
 
         long start = System.currentTimeMillis();
@@ -39,7 +41,7 @@ public class Main {
             System.out.println("Joined: " + vt.getName());
             String orderedText = vt.getOrderedText();
             if (!orderedText.equals("")) {
-                ReceiptMaster rm = new ReceiptMaster(orderedText);
+                ReceiptMaster rm = new ReceiptMaster(orderedText, excelFilePath);
             }
             else {
                 nonReceiptImageCounter++;

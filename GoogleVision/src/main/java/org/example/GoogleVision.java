@@ -7,11 +7,13 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 public class GoogleVision {
-    private List<WordText> words = new ArrayList<WordText>();
+    private List<WordText> words = new ArrayList<>();
     private String imageLabel = "";
+    private HashSet<String> imageLabelSet = new HashSet<>();
     private String orderedText = "";
 
     public GoogleVision(String filePath) throws Exception{
@@ -23,7 +25,7 @@ public class GoogleVision {
         System.out.println(words.get(0).getText()); // print the full text
 
         // if the image is a receipt or a font, do some special ordering on the text Vision returns
-        if ("Receipt".equals(imageLabel) || "Font".equals(imageLabel)) {
+        if (imageLabelSet.contains("Receipt") || imageLabelSet.contains("Font")) {
             System.out.println("\n Since this image is analyzed to be a receipt," +
                     " here is the ordered version of it: ");
             words.remove(0); // (skip the first text as it's the full text)
@@ -91,13 +93,9 @@ public class GoogleVision {
                 }
 
                 // get label annotation
-                /*
                 for (EntityAnnotation annotation : res.getLabelAnnotationsList()) {
-                    annotation
-                            .getAllFields()
-                            .forEach((k, v) -> System.out.format("%s : %s%n", k, v.toString()));
+                    imageLabelSet.add(annotation.getDescription());
                 }
-                 */
 
                 // get the most confident image label when res is regarding Label Response
                 try {
@@ -112,7 +110,7 @@ public class GoogleVision {
 
     private String orderReceiptText(List<WordText> words) {
         StringBuilder textSoFar = new StringBuilder();
-        List<WordText> removedWords = new ArrayList<WordText>();
+        List<WordText> removedWords = new ArrayList<>();
 
 
         // iterate through every word in the text in the order that GoogleVision captured
