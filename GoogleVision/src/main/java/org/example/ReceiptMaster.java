@@ -203,19 +203,24 @@ public class ReceiptMaster {
             }
             prevLine = tLine;
         }
-        try {
-            kdv = kdv.replace(".", "");
-            kdv = kdv.substring(0, kdv.length() - 2) + "." + kdv.substring(kdv.length() - 2);
-            toplam = toplam.replace(".", "");
-            toplam = toplam.substring(0, toplam.length() - 2) + "." + toplam.substring(toplam.length() - 2);
-            tutar = String.valueOf(Integer.parseInt(toplam.replace(".", "")) -
-                    Integer.parseInt(kdv.replace(".", "")));
-            tutar = tutar.substring(0, tutar.length() - 2) + "." + tutar.substring(tutar.length() - 2);
 
+        if (StringUtils.isNotEmpty(tarih)) {
             tarih = tarih.replace(".", "/");
             tarih = tarih.replace("-", "/");
         }
-        catch (Exception ignored) {}
+        if (StringUtils.isNotEmpty(kdv)) {
+            kdv = kdv.replace(".", "");
+            kdv = kdv.substring(0, kdv.length() - 2) + "." + kdv.substring(kdv.length() - 2);
+        }
+        if (StringUtils.isNotEmpty(toplam)) {
+            toplam = toplam.replace(".", "");
+            toplam = toplam.substring(0, toplam.length() - 2) + "." + toplam.substring(toplam.length() - 2);
+        }
+        if (StringUtils.isNotEmpty(kdv) && StringUtils.isNotEmpty(toplam)) {
+            tutar = String.valueOf(Integer.parseInt(toplam.replace(".", "")) -
+                    Integer.parseInt(kdv.replace(".", "")));
+            tutar = tutar.substring(0, tutar.length() - 2) + "." + tutar.substring(tutar.length() - 2);
+        }
 
         System.out.println("Tarih: " + tarih);
         System.out.println("Belge Adi: " + belgeAdi);

@@ -4,14 +4,51 @@ import com.google.cloud.vision.v1.*;
 import com.google.protobuf.ByteString;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class GoogleVision {
-    String orderedText = "";
+    private List<WordText> words = new ArrayList<WordText>();
+    private String imageLabel = "";
+    private String orderedText = "";
+
     public GoogleVision(String filePath) throws Exception{
+        convertImageToText(filePath); // gets words and imageLabel
+
+        System.out.println("The image is analyzed to be: " + imageLabel);
+
+        System.out.println("The Original Text: ");
+        System.out.println(words.get(0).getText()); // print the full text
+
+        // if the image is a receipt or a font, do some special ordering on the text Vision returns
+        if ("Receipt".equals(imageLabel) || "Font".equals(imageLabel)) {
+            System.out.println("\n Since this image is analyzed to be a receipt," +
+                    " here is the ordered version of it: ");
+            words.remove(0); // (skip the first text as it's the full text)
+            orderedText = orderReceiptText(words);
+            System.out.println(orderedText);
+            // ReceiptMaster rm = new ReceiptMaster(orderedText);
+        }
+    }
+
+    public String getOrderedText() {
+        return orderedText;
+    }
+
+    public void convertImageToText(String filePath) throws Exception {
         List<AnnotateImageRequest> requests = new ArrayList<>();
-        ByteString imgBytes = ByteString.readFrom(new FileInputStream(filePath));
+        ByteString imgBytes = null;
+        try {
+            imgBytes = ByteString.readFrom(new FileInputStream(filePath));
+        }
+        catch (FileNotFoundException fnfe) {
+            System.out.println("FileNotFoundException. An image doesn't exist at: " + filePath);
+        }
+        catch (IOException ioe) {
+            System.out.println("IOException. An image doesn't exist at: " + filePath);
+        }
 
         Image img = Image.newBuilder().setContent(imgBytes).build();
         Feature textFeat = Feature.newBuilder().setType(Feature.Type.DOCUMENT_TEXT_DETECTION).build();
@@ -32,16 +69,12 @@ public class GoogleVision {
             List<AnnotateImageResponse> responses = response.getResponsesList();
             client.close();
 
-            List<WordText> words = new ArrayList<WordText>();
-
-            String imageLabel = "";
-
             // starting the annotation of the image
             // full list of available annotations can be found at http://g.co/cloud/vision/docs
             for (AnnotateImageResponse res : responses) {
                 if (res.hasError()) {
                     System.out.format("Error: %s%n", res.getError().getMessage());
-                    return;
+                    break;
                 }
 
                 // get text annotation
@@ -73,26 +106,8 @@ public class GoogleVision {
                 catch (Exception ignored) {
                 }
             }
-            System.out.println("The image is analyzed to be: " + imageLabel);
-
-            System.out.println("The Original Text: ");
-            System.out.println(words.get(0).getText()); // print the full text
-
-            if ("Receipt".equals(imageLabel) || "Font".equals(imageLabel)) {
-                System.out.println("\n Since this image is analyzed to be a receipt," +
-                        " here is the ordered version of it: ");
-                words.remove(0); // (skip the first text as it's the full text)
-                orderedText = orderReceiptText(words);
-                System.out.println(orderedText);
-                ReceiptMaster rm = new ReceiptMaster(orderedText);
-            }
-
         }
 
-    }
-
-    public String getOrderedText() {
-        return orderedText;
     }
 
     private String orderReceiptText(List<WordText> words) {

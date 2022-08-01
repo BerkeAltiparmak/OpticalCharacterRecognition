@@ -12,7 +12,7 @@ public class VisionThread extends Thread {
         try {
             GoogleVision gv = new GoogleVision(filePath);
         } catch (Exception e) {
-            System.out.println("threadde error abi");
+            System.out.println("thread error somehow");
         }
     }
 

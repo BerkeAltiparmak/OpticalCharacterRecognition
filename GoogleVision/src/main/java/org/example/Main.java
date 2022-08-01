@@ -9,44 +9,51 @@ import java.util.List;
 
 
 public class Main {
-    static String SRC_PATH = "src/images/";
+    static String sourcePath = "src/images/";
     static String fileName = "example15";
     static String fileExtension = ".png"; // didn't work with .pdf
-    static boolean is_processed = false;
     public static void main(String[] args) throws Exception {
 
         long start = System.currentTimeMillis();
-
-        // using opencv-4.5.5 to preprocess the image.
-        // ImageProcessor ig = new ImageProcessor(SRC_PATH, fileName, fileExtension);
-
-        // if you want to process the data with opencv
-        String filePath = SRC_PATH + fileName + fileExtension;
-        if (is_processed) {
-            filePath = SRC_PATH + fileName + "GrayCanny" + fileExtension;
-        }
 
         // read the image with GoogleVision and get the orderedText if it is a receipt
         // GoogleVision gv = new GoogleVision(filePath);
         // String orderedText = gv.getOrderedText();
 
-        Thread vt = new VisionThread(filePath);
+
+        // an attempt at multithreading
+        Thread vt = new VisionThread(sourcePath + fileName + fileExtension);
         vt.start();
-        System.out.println("\n \n OYYYY \n \n");
+        System.out.println("\n \n NEXT \n \n");
         fileName = "example4";
-        Thread vt2 = new VisionThread(SRC_PATH + fileName + fileExtension);
+        Thread vt2 = new VisionThread(sourcePath + fileName + fileExtension);
         vt2.start();
+        fileName = "example5";
+        Thread vt3 = new VisionThread(sourcePath + fileName + fileExtension);
+        vt3.start();
+        fileName = "example9";
+        Thread vt4 = new VisionThread(sourcePath + fileName + fileExtension);
+        vt4.start();
         // String orderedText = vt.getOrderedText();
-/*
+
+
+        /*
         if (!orderedText.equals("")) {
             ReceiptMaster rm = new ReceiptMaster(orderedText);
         }
         else {
             System.out.println("The image is not a receipt");
         }
-
- */
+        */
 
         System.out.println("It took: " + (System.currentTimeMillis() - start) + " milliseconds.");
+    }
+
+    private static String process_image_with_opencv(String newFileName) {
+        // using opencv-4.5.5 to preprocess the image.
+        ImageProcessor ig = new ImageProcessor(sourcePath, newFileName, fileExtension);
+
+        // returns the address of the newly processed image
+        return sourcePath + fileName + "GrayCanny" + fileExtension;
     }
 }
