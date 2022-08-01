@@ -2,60 +2,67 @@ package org.example;
 
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
 
 public class ReceiptMaster {
     private final double threshold = 0.8;
+    public String excelFilePath = "src/tables/Vergilers.xlsx";
     public ReceiptMaster(String text) {
         Map<String, String> associatedMap = new HashMap<>();
         associatedMap = getAssociatedCategories(text);
-        /*
         try {
             writeIntoExcelFile(associatedMap);
         }
         catch (IOException ioe) {
             System.out.println("IOException detected");
         }
-         */
     }
 
     private void writeIntoExcelFile(Map<String, String> associatedMap) throws IOException {
-        XSSFWorkbook workbook = new XSSFWorkbook();
-        XSSFSheet sheet = workbook.createSheet("Vergi Verileri");
+        List<Object[]> vergiData = new ArrayList<>();
+        Workbook workbook;
+        Sheet sheet;
+        String[] headers = {"Tarih", "Belge Adi", "Belge No", "Vergi Dairesi", "Vergi No", "KDV", "Tutar", "Toplam"};
+        int rowCount = 0;
+        try {
+            FileInputStream inputStream = new FileInputStream(excelFilePath);
 
-        Object[][] vergiData = new Object[2][8];
-        String[] infos = {"Tarih", "Belge Adi", "Belge No", "Vergi Dairesi", "Vergi No", "KDV", "Tutar", "Toplam"};
+            //Creating workbook from input stream
+            workbook = WorkbookFactory.create(inputStream);
 
-        vergiData[0][0] = infos[0];
-        vergiData[0][1] = infos[1];
-        vergiData[0][2] = infos[2];
-        vergiData[0][3] = infos[3];
-        vergiData[0][4] = infos[4];
-        vergiData[0][5] = infos[5];
-        vergiData[0][6] = infos[6];
-        vergiData[0][7] = infos[7];
+            //Reading first sheet of excel file
+            sheet = workbook.getSheetAt(0);
 
-        for (int i = 0; i < 8; i ++) {
-            vergiData[1][i] = associatedMap.get(infos[i]);
+            //Getting the count of existing records
+            rowCount = sheet.getLastRowNum();
+        }
+        catch (Exception e) {
+            workbook = new XSSFWorkbook();
+            sheet = workbook.createSheet("Vergi Verileri");
+            rowCount = 0;
+            vergiData.add(headers);
         }
 
+        Object[] mapToArray = new Object[8];
+        for (int i = 0; i < 8; i ++) {
+            mapToArray[i] = associatedMap.get(headers[i]);
+        }
+        vergiData.add(mapToArray);
 
 
-        int rowCount = 0;
-
-        for (Object[] aBook : vergiData) {
+        for (Object[] vergi : vergiData) {
             Row row = sheet.createRow(++rowCount);
 
             int columnCount = 0;
 
-            for (Object field : aBook) {
+            for (Object field : vergi) {
                 Cell cell = row.createCell(++columnCount);
                 if (field instanceof String) {
                     cell.setCellValue((String) field);
@@ -63,11 +70,9 @@ public class ReceiptMaster {
                     cell.setCellValue((Integer) field);
                 }
             }
-
         }
 
-
-        try (FileOutputStream outputStream = new FileOutputStream("src/tables/Vergiler15new.xlsx")) {
+        try (FileOutputStream outputStream = new FileOutputStream(excelFilePath)) {
             workbook.write(outputStream);
         }
     }

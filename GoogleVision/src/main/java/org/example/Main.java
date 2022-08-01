@@ -22,19 +22,30 @@ public class Main {
 
 
         // an attempt at multithreading
-        Thread vt = new VisionThread(sourcePath + fileName + fileExtension);
-        vt.start();
-        System.out.println("\n \n NEXT \n \n");
-        fileName = "example4";
-        Thread vt2 = new VisionThread(sourcePath + fileName + fileExtension);
-        vt2.start();
-        fileName = "example5";
-        Thread vt3 = new VisionThread(sourcePath + fileName + fileExtension);
-        vt3.start();
-        fileName = "example9";
-        Thread vt4 = new VisionThread(sourcePath + fileName + fileExtension);
-        vt4.start();
-        // String orderedText = vt.getOrderedText();
+        String[] fileNameArr = {"example15", "example4", "example5", "example9"};
+        List<VisionThread> threadList = new ArrayList<>();
+
+        for (String fileName: fileNameArr) {
+            VisionThread vt = new VisionThread(sourcePath + fileName + fileExtension);
+            vt.start();
+            threadList.add(vt);
+            System.out.println("Starting: " + vt.getName());
+        }
+
+        int nonReceiptImageCounter = 0;
+        for (VisionThread vt: threadList) {
+            System.out.println("Joining: " + vt.getName());
+            vt.join();
+            System.out.println("Joined: " + vt.getName());
+            String orderedText = vt.getOrderedText();
+            if (!orderedText.equals("")) {
+                ReceiptMaster rm = new ReceiptMaster(orderedText);
+            }
+            else {
+                nonReceiptImageCounter++;
+            }
+        }
+        System.out.println(nonReceiptImageCounter);
 
 
         /*

@@ -2,7 +2,7 @@ package org.example;
 
 public class VisionThread extends Thread {
     private final String filePath;
-    public String orderedText = "";
+    public volatile String orderedText = "";
 
     public VisionThread(String filePath) {
         this.filePath = filePath;
@@ -11,6 +11,7 @@ public class VisionThread extends Thread {
     public void run() {
         try {
             GoogleVision gv = new GoogleVision(filePath);
+            orderedText = gv.getOrderedText();
         } catch (Exception e) {
             System.out.println("thread error somehow");
         }
