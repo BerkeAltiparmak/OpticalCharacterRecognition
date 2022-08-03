@@ -266,7 +266,7 @@ public class ReceiptMaster {
         belgeNoList.add("FİŞNO");belgeNoList.add("FIŞNO");belgeNoList.add("FISNO");belgeNoList.add("FİSNO");
         belgeNoList.add("SATIŞNO");belgeNoList.add("SATİŞNO");belgeNoList.add("SATİSNO");belgeNoList.add("SATISNO");
 
-        kdvList.add("TOPKDV");kdvList.add("TOPLAM KDV");
+        kdvList.add("TOPKDV");kdvList.add("TOPLAM KDV");kdvList.add("TOP ");
 
         toplamList.add("TOPLAM");toplamList.add("TPLM");
 

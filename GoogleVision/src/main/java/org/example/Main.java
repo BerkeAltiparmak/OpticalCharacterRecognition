@@ -12,19 +12,23 @@ public class Main {
     static String sourcePath = "src/images/";
     static String fileName = "example15";
     static String fileExtension = ".png"; // didn't work with .pdf
-    private static String excelFilePath = "src/tables/VergilerOldMethod.xlsx";
+    private static String imageFolderPath = "src/images/receipts";
+    private static String excelFilePath = "src/tables/VergilerMulti.xlsx";
 
     public static void main(String[] args) throws Exception {
 
         long start = System.currentTimeMillis();
 
+        /*
+        READING A SINGLE FILE
         // read the image with GoogleVision and get the orderedText if it is a receipt
-        // GoogleVision gv = new GoogleVision(filePath);
-        // String orderedText = gv.getOrderedText();
+        GoogleVision gv = new GoogleVision(filePath);
+        String orderedText = gv.getOrderedText();
+         */
 
-
-        // an attempt at multithreading
-        String[] fileNameArr = {"example15", "example4", "example5", "example9"};
+        /*
+        READING MULTIPLE FILES WITH MULTITHREADING
+        String[] fileNameArr = {"example6"};
         List<VisionThread> threadList = new ArrayList<>();
 
         for (String fileName: fileNameArr) {
@@ -48,16 +52,10 @@ public class Main {
             }
         }
         System.out.println(nonReceiptImageCounter);
-
-
-        /*
-        if (!orderedText.equals("")) {
-            ReceiptMaster rm = new ReceiptMaster(orderedText);
-        }
-        else {
-            System.out.println("The image is not a receipt");
-        }
         */
+
+        // READING MULTIPLE IMAGES WITH GOOGLE VISION API, NO THREADS
+        MultiVision mv = new MultiVision(imageFolderPath, excelFilePath);
 
         System.out.println("It took: " + (System.currentTimeMillis() - start) + " milliseconds.");
     }
