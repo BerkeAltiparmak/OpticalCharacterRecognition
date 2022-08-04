@@ -3,9 +3,9 @@ package org.example;
 
 
 public class Main {
-    static String sourcePath = "src/images/";
-    static String fileName = "example15";
-    static String fileExtension = ".png"; // didn't work with .pdf
+    private static String sourcePath = "src/images/";
+    private static String fileName = "example15";
+    private static String fileExtension = ".png"; // didn't work with .pdf
     private static String imageFolderPath = "src/images/receipts";
     private static String excelFilePath = "src/tables/VergilerMulti.xlsx";
 
