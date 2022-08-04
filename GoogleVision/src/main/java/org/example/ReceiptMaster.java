@@ -13,7 +13,7 @@ import java.util.*;
 
 public class ReceiptMaster {
     private final double threshold = 0.8;
-    public String excelFilePath = "src/tables/Vergilerim.xlsx";
+    private String excelFilePath = "src/tables/Vergilerim.xlsx";
     public ReceiptMaster(String text, String excelFilePath) {
         this.excelFilePath = excelFilePath;
         Map<String, String> associatedMap = new HashMap<>();

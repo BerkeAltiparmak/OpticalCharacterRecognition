@@ -13,6 +13,6 @@ import java.util.*;
 public class Tester {
     static String excelFilePath = "src/tables/Vergilerim.xlsx";
     public static void main(String[] args) throws IOException {
-        Classifier c = new Classifier("src/images/example16.png");
+
     }
 }

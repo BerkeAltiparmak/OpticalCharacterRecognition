@@ -12,13 +12,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class MultiVision {
-    public List<String> orderedTextList = new ArrayList<>();
+    private List<String> orderedTextList = new ArrayList<>();
 
-    public MultiVision(String imageFolderPath, String excelFilePath) throws Exception {
-        // "src/images/receipts"
-        // "src/tables/VergilerNewMethod.xlsx";
-        convertImageToText(imageFolderPath, excelFilePath);
-    }
+    public MultiVision() {}
 
     public void convertImageToText(String imageFolderPath, String excelFilePath) throws Exception {
         List<AnnotateImageRequest> requests = new ArrayList<>();
