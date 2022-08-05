@@ -19,9 +19,10 @@ import java.util.stream.Collectors;
 @Service
 public class OcrServiceImpl implements OcrService {
 
-    private List<String> orderedTextList = new ArrayList<>();
     @Override
-    public void convertImageToText(MultipartFile... files) throws IOException {
+    public List<String> convertImageToText(MultipartFile... files) throws IOException {
+        List<String> orderedTextList = new ArrayList<>();
+
         List<AnnotateImageRequest> requests = new ArrayList<>();
 
 
@@ -101,6 +102,8 @@ public class OcrServiceImpl implements OcrService {
                 // }
             }
         }
+
+        return orderedTextList;
     }
 
     public String orderReceiptText(List<TextModel> words) {

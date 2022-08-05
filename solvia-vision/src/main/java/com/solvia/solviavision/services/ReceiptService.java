@@ -4,5 +4,5 @@ import java.util.Map;
 
 public interface ReceiptService {
 
-    Map<String, String> getAssociatedCategories(String text);
+    public Map<String, String> getImportantReceiptInfo(String text, String csvFilePath);
 }

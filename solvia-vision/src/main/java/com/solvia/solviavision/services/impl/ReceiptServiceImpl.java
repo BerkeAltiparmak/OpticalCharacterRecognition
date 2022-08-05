@@ -4,6 +4,9 @@ import com.solvia.solviavision.services.ReceiptService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.*;
 
 @Service
@@ -11,8 +14,8 @@ public class ReceiptServiceImpl implements ReceiptService {
 
     private static final double SIMILARITY_THRESHOLD = 0.8;
 
-    public Map<String, String> getAssociatedCategories(String text) {
-        Map<String, String> associatedMap = new HashMap<String, String>();
+    public Map<String, String> getImportantReceiptInfo(String text, String csvFilePath) {
+        Map<String, String> importantInfoMap = new HashMap<String, String>();
 
         String tarih = "";
         String belgeNo = "";
@@ -23,18 +26,32 @@ public class ReceiptServiceImpl implements ReceiptService {
         String kdv = "";
         String toplam = "";
 
+        /*
         List<String>[] altNames = getAlternativeNames();
         List<String> tarihList = altNames[0]; List<String> belgeNoList = altNames[1];
         List<String> kdvList = altNames[2]; List<String> toplamList = altNames[3];
         List<String> vergiList = altNames[4];
+         */
+        List<List<String>> alternativeNames = getAlternativeNamesFromCSV(csvFilePath);
 
-        String textLines[] = text.split("\\n");
+        List<String> tarihList = alternativeNames.get(0);
+        List<String> belgeNoList = alternativeNames.get(1);
+        List<String> kdvList = alternativeNames.get(2);
+        List<String> toplamList = alternativeNames.get(3);
+        List<String> vergiList = alternativeNames.get(4);
+
+        String[] textLines = text.split("\\n");
         String prevLine = "";
 
         // get belgeAdi
         belgeAdi = textLines[0];
         if (belgeAdi.equals("")) {
-            belgeAdi = textLines[1];
+            try {
+                belgeAdi = textLines[1];
+            }
+            catch (ArrayIndexOutOfBoundsException aioobe) {
+                System.out.println("Encountered empty text");
+            }
         }
 
         for (String tLine: textLines) {
@@ -170,20 +187,20 @@ public class ReceiptServiceImpl implements ReceiptService {
         System.out.println("Tutar: " + tutar);
         System.out.println("Toplam: " + toplam);
 
-        associatedMap.put("Tarih", tarih);
-        associatedMap.put("Belge Adi", belgeAdi);
-        associatedMap.put("Belge No", belgeNo);
-        associatedMap.put("Vergi Dairesi", vergiDairesi);
-        associatedMap.put("Vergi No", vergiNo);
-        associatedMap.put("KDV", kdv);
-        associatedMap.put("Tutar", tutar);
-        associatedMap.put("Toplam", toplam);
+        importantInfoMap.put("Tarih", tarih);
+        importantInfoMap.put("Belge Adi", belgeAdi);
+        importantInfoMap.put("Belge No", belgeNo);
+        importantInfoMap.put("Vergi Dairesi", vergiDairesi);
+        importantInfoMap.put("Vergi No", vergiNo);
+        importantInfoMap.put("KDV", kdv);
+        importantInfoMap.put("Tutar", tutar);
+        importantInfoMap.put("Toplam", toplam);
 
-        return associatedMap;
+        return importantInfoMap;
     }
 
-    private List<String>[] getAlternativeNames() {
-        List<String>[] alternatives = new ArrayList[5];
+    private List<List<String>> getAlternativeNamesFromCSV(String csvFilePath) {
+        List<List<String>> alternativeNames = new ArrayList<>();
 
         List<String> tarihList = new ArrayList<>();
         List<String> belgeNoList = new ArrayList<>();
@@ -191,27 +208,32 @@ public class ReceiptServiceImpl implements ReceiptService {
         List<String> toplamList = new ArrayList<>();
         List<String> vergiList = new ArrayList<>();
 
-        // other things might include these numbers as well (cellphone numbers, vergiNo, etc.)
-        tarihList.add("/2019");tarihList.add("/2020");tarihList.add("/2021");tarihList.add("/2022");tarihList.add("/2023");
-        tarihList.add(".2019");tarihList.add(".2020");tarihList.add(".2021");tarihList.add(".2022");tarihList.add(".2023");
-        tarihList.add("-2019");tarihList.add("-2020");tarihList.add("-2021");tarihList.add("-2022");tarihList.add("-2023");
+        String line = "";
+        try {
+            //parsing a CSV file into BufferedReader class constructor
+            BufferedReader br = new BufferedReader(new FileReader(csvFilePath));
+            while ((line = br.readLine()) != null)
+            {
+                //use comma as separator
+                List<String> csvLine = Arrays.asList(line.split(","));
+                if ("*TARIH*".equals(csvLine.get(0))) {tarihList.addAll(csvLine);}
+                if ("*BELGENO*".equals(csvLine.get(0))) {belgeNoList.addAll(csvLine);}
+                if ("*KDV*".equals(csvLine.get(0))) {kdvList.addAll(csvLine);}
+                if ("*TOPLAM*".equals(csvLine.get(0))) {toplamList.addAll(csvLine);}
+                if ("*VERGI*".equals(csvLine.get(0))) {vergiList.addAll(csvLine);}
+            }
+        }
+        catch(IOException ioe) {
+            System.out.println("CSV file not found");
+        }
 
-        belgeNoList.add("FİŞNO");belgeNoList.add("FIŞNO");belgeNoList.add("FISNO");belgeNoList.add("FİSNO");
-        belgeNoList.add("SATIŞNO");belgeNoList.add("SATİŞNO");belgeNoList.add("SATİSNO");belgeNoList.add("SATISNO");
+        alternativeNames.add(tarihList);
+        alternativeNames.add(belgeNoList);
+        alternativeNames.add(kdvList);
+        alternativeNames.add(toplamList);
+        alternativeNames.add(vergiList);
 
-        kdvList.add("TOPKDV");kdvList.add("TOPLAM KDV");kdvList.add("TOP ");
-
-        toplamList.add("TOPLAM");toplamList.add("TPLM");
-
-        vergiList.add(" VD");vergiList.add("V.D");vergiList.add("Vergi Dairesi");
-
-        alternatives[0] = tarihList;
-        alternatives[1] = belgeNoList;
-        alternatives[2] = kdvList;
-        alternatives[3] = toplamList;
-        alternatives[4] = vergiList;
-
-        return alternatives;
+        return alternativeNames;
     }
 
     private boolean isIntOrAccep(String st) {

@@ -4,7 +4,25 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="118c0ea7-2b80-4cc2-a688-6256de349354" name="Changes" comment="" />
+    <list default="true" id="118c0ea7-2b80-4cc2-a688-6256de349354" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/solvia/solviavision/services/ExcelService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/solvia/solviavision/services/impl/ExcelServiceImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/alternativeNames.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/solvia/solviavision/controllers/ImageController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/solvia/solviavision/controllers/ImageController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/solvia/solviavision/services/OcrService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/solvia/solviavision/services/OcrService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/solvia/solviavision/services/ReceiptService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/solvia/solviavision/services/ReceiptService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/solvia/solviavision/services/impl/OcrServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/solvia/solviavision/services/impl/OcrServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/solvia/solviavision/services/impl/ReceiptServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/solvia/solviavision/services/impl/ReceiptServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/solvia/solviavision/SolviaVisionApplicationTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/solvia/solviavision/SolviaVisionApplicationTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/solvia/solviavision/controllers/ImageController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/solvia/solviavision/controllers/ImageController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/solvia/solviavision/services/OcrService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/solvia/solviavision/services/OcrService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/solvia/solviavision/services/ReceiptService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/solvia/solviavision/services/ReceiptService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/solvia/solviavision/services/impl/OcrServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/solvia/solviavision/services/impl/OcrServiceImpl.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/solvia/solviavision/services/impl/ReceiptServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/solvia/solviavision/services/impl/ReceiptServiceImpl.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/test-classes/com/solvia/solviavision/SolviaVisionApplicationTests.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/test-classes/com/solvia/solviavision/SolviaVisionApplicationTests.class" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -13,8 +31,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Class" />
         <option value="Interface" />
+        <option value="Class" />
       </list>
     </option>
   </component>
@@ -39,8 +57,8 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
-    "last_opened_file_path": "C:/Users/SOLVIA/Desktop/OpticalCharacterRecognition/solvia-vision/pom.xml",
-    "settings.editor.selected.configurable": "preferences.lookFeel"
+    "last_opened_file_path": "C:/Users/SOLVIA/Desktop/OpticalCharacterRecognition/solvia-vision",
+    "settings.editor.selected.configurable": "advanced.settings"
   }
 }]]></component>
   <component name="RunAnythingCache">
@@ -62,6 +80,22 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="SolviaVisionApplicationTests.receiptServiceTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="solvia-vision" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.solvia.solviavision.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.solvia.solviavision" />
+      <option name="MAIN_CLASS_NAME" value="com.solvia.solviavision.SolviaVisionApplicationTests" />
+      <option name="METHOD_NAME" value="receiptServiceTest" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="SolviaVisionApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
       <option name="ACTIVE_PROFILES" />
       <envs>
@@ -76,6 +110,7 @@
     <recent_temporary>
       <list>
         <item itemvalue="Application.SolviaVisionApplication" />
+        <item itemvalue="JUnit.SolviaVisionApplicationTests.receiptServiceTest" />
       </list>
     </recent_temporary>
   </component>
