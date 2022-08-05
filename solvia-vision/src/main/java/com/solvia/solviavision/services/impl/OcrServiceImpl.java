@@ -1,9 +1,14 @@
-package org.example;
+package com.solvia.solviavision.services.impl;
 
 import com.google.cloud.vision.v1.*;
 import com.google.protobuf.ByteString;
+import com.solvia.solviavision.models.TextModel;
+import com.solvia.solviavision.services.OcrService;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -11,19 +16,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class MultiVision {
+@Service
+public class OcrServiceImpl implements OcrService {
+
     private List<String> orderedTextList = new ArrayList<>();
-
-    public MultiVision() {}
-
-    public void convertImageToText(String imageFolderPath, String excelFilePath) throws Exception {
+    @Override
+    public void convertImageToText(MultipartFile... files) throws IOException {
         List<AnnotateImageRequest> requests = new ArrayList<>();
-        List<Path> filePathList = Files.walk(Paths.get(imageFolderPath))
-                .filter(Files::isRegularFile)
-                .collect(Collectors.toList());
 
-        for (Path filePath: filePathList) {
-            ByteString imgBytes = ByteString.readFrom(new FileInputStream(filePath.toString()));
+
+        for (MultipartFile fl: files) {
+            ByteString imgBytes = ByteString.copyFrom(fl.getBytes());
 
             Image img = Image.newBuilder().setContent(imgBytes).build();
             Feature textFeat = Feature.newBuilder().setType(Feature.Type.DOCUMENT_TEXT_DETECTION).build();
@@ -50,7 +53,7 @@ public class MultiVision {
 
             // starting the annotation of the image
             // full list of available annotations can be found at http://g.co/cloud/vision/docs
-            List<WordText> words = new ArrayList<>();
+            List<TextModel> words = new ArrayList<>();
             // HashSet<String> imageLabelSet = new HashSet<>();
             for (AnnotateImageResponse res : responses) {
                 if (res.hasError()) {
@@ -58,8 +61,8 @@ public class MultiVision {
                     break;
                 }
                 // if (!res.getLabelAnnotationsList().isEmpty()) {
-                    words = new ArrayList<>();
-                    // imageLabelSet = new HashSet<>();
+                words = new ArrayList<>();
+                // imageLabelSet = new HashSet<>();
                 // }
 
                 // get text annotation
@@ -72,7 +75,7 @@ public class MultiVision {
                     // System.out.println("Topicality: " + annotation.getTopicality());
 
                     // in order to properly order the words, we put them and their properties to an ArrayList
-                    WordText word = new WordText(text, boundingPoly);
+                    TextModel word = new TextModel(text, boundingPoly);
                     if (word.isCounterClockwiseFromTopLeft()){
                         words.add(word);
                     }
@@ -88,25 +91,25 @@ public class MultiVision {
 
                 String orderedText = "";
                 // if (imageLabelSet.contains("Receipt") || imageLabelSet.contains("Font")) {
-                    System.out.println("\n Since this image is analyzed to be a receipt," +
-                            " here is the ordered version of it: ");
-                    words.remove(0); // (skip the first text as it's the full text)
-                    orderedText = orderReceiptText(words);
-                    orderedTextList.add(orderedText);
-                    System.out.println(orderedText);
-                    ReceiptMaster rm = new ReceiptMaster(orderedText, excelFilePath);
+                System.out.println("\n Since this image is analyzed to be a receipt," +
+                        " here is the ordered version of it: ");
+                words.remove(0); // (skip the first text as it's the full text)
+                orderedText = orderReceiptText(words);
+                orderedTextList.add(orderedText);
+                System.out.println(orderedText);
+                //ReceiptMaster rm = new ReceiptMaster(orderedText, excelFilePath);
                 // }
             }
         }
     }
 
-    private static String orderReceiptText(List<WordText> words) {
+    public String orderReceiptText(List<TextModel> words) {
         StringBuilder textSoFar = new StringBuilder();
-        List<WordText> removedWords = new ArrayList<>();
+        List<TextModel> removedWords = new ArrayList<>();
 
 
         // iterate through every word in the text in the order that GoogleVision captured
-        for (WordText word1: words) {
+        for (TextModel word1: words) {
 
             // if the word is already written in the text or is not in the correct orientation, don't mind it
             if (!removedWords.contains(word1) && word1.isCounterClockwiseFromTopLeft()) {
@@ -124,7 +127,7 @@ public class MultiVision {
                 removedWords.add(word1);
 
                 // iterate through every other word to compare other word's y-coordinates with word1
-                for (WordText word2 : words) {
+                for (TextModel word2 : words) {
 
                     // make sure the word is correctly orientated
                     if (word2 != word1 && !removedWords.contains(word2) && word2.isCounterClockwiseFromTopLeft()) {

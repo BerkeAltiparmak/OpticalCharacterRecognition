@@ -84,12 +84,14 @@ public class GoogleVision {
                     String text = annotation.getDescription();
                     BoundingPoly boundingPoly = annotation.getBoundingPoly();
 
-                    // System.out.format("Text: %s%n", text);
-                    // System.out.format("Position : %s%n", boundingPoly);
+                    System.out.format("Text: %s%n", text);
+                    System.out.format("Position : %s%n", boundingPoly);
                     // System.out.println("Topicality: " + annotation.getTopicality());
 
                     // in order to properly order the words, we put them and their properties to an ArrayList
-                    words.add(new WordText(text, boundingPoly));
+                    WordText word = new WordText(text, boundingPoly);
+                    words.add(word);
+                    System.out.println(word.isCounterClockwiseFromTopLeft());
                 }
 
                 // get label annotation
