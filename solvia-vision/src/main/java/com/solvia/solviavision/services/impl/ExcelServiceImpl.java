@@ -6,6 +6,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -62,7 +63,14 @@ public class ExcelServiceImpl implements ExcelService {
             }
         }
 
-        try (FileOutputStream outputStream = new FileOutputStream(excelFilePath)) {
+        try {
+            FileOutputStream outputStream = new FileOutputStream(excelFilePath);
+            workbook.write(outputStream);
+        }
+        catch (FileNotFoundException fnfe) {
+            FileOutputStream outputStream = new FileOutputStream(
+                    excelFilePath.substring(0, excelFilePath.lastIndexOf(".")) + " (1)" +
+                    excelFilePath.substring(excelFilePath.lastIndexOf(".")));
             workbook.write(outputStream);
         }
     }

@@ -40,6 +40,9 @@ public class ReceiptServiceImpl implements ReceiptService {
         List<String> toplamList = alternativeNames.get(3);
         List<String> vergiList = alternativeNames.get(4);
 
+        boolean checkNextLineForKdv = false;
+        boolean checkNextLineForToplam = false;
+
         String[] textLines = text.split("\\n");
         String prevLine = "";
 
@@ -55,6 +58,45 @@ public class ReceiptServiceImpl implements ReceiptService {
         }
 
         for (String tLine: textLines) {
+
+            // if we got information from the previous text line, check this information with the next line first
+
+            if (checkNextLineForKdv) {
+                checkNextLineForKdv = false;
+                for (int j = 0; j < tLine.length(); j++) {
+                    if (isIntOrAccep(tLine.substring(j, j + 1))) {
+                        if (isInt(tLine.substring(j, j + 1))) {
+                            kdv += tLine.substring(j, j + 1);
+                        }
+
+                        if (tLine.substring(j, j + 1).equals(",") || tLine.substring(j, j + 1).equals(".")) {
+                            kdv += '.';
+                        }
+                    }
+                    else {
+                        break;
+                    }
+                }
+            }
+
+            if (checkNextLineForToplam) {
+                checkNextLineForToplam = false;
+                for (int j = 0; j < tLine.length(); j++) {
+                    if (isIntOrAccep(tLine.substring(j, j + 1))) {
+                        if (isInt(tLine.substring(j, j + 1))) {
+                            toplam += tLine.substring(j, j + 1);
+                        }
+
+                        if (tLine.substring(j, j + 1).equals(",") || tLine.substring(j, j + 1).equals(".")) {
+                            toplam += '.';
+                        }
+                    }
+                    else {
+                        break;
+                    }
+                }
+            }
+
             for (int i = 0; i <= tLine.length(); i++) {
 
                 // get tarih
@@ -128,6 +170,11 @@ public class ReceiptServiceImpl implements ReceiptService {
                                         break;
                                 }
                             }
+
+                            // if kdv is still empty, check the next line
+                            if (kdv.equals("")) {
+                                checkNextLineForKdv = true;
+                            }
                         }
                     }
                 }
@@ -151,6 +198,11 @@ public class ReceiptServiceImpl implements ReceiptService {
                                         break;
                                 }
                             }
+
+                            // if toplam is still empty, check the next line
+                            if (toplam.equals("")) {
+                                checkNextLineForToplam = true;
+                            }
                         }
                     }
                 }
@@ -164,18 +216,23 @@ public class ReceiptServiceImpl implements ReceiptService {
             tarih = tarih.replace(".", "/");
             tarih = tarih.replace("-", "/");
         }
-        if (StringUtils.isNotEmpty(kdv)) {
+        if (StringUtils.isNotEmpty(kdv) && kdv.length() > 2) {
             kdv = kdv.replace(".", "");
             kdv = kdv.substring(0, kdv.length() - 2) + "." + kdv.substring(kdv.length() - 2);
         }
-        if (StringUtils.isNotEmpty(toplam)) {
+        if (StringUtils.isNotEmpty(toplam) && toplam.length() > 2) {
             toplam = toplam.replace(".", "");
             toplam = toplam.substring(0, toplam.length() - 2) + "." + toplam.substring(toplam.length() - 2);
         }
-        if (StringUtils.isNotEmpty(kdv) && StringUtils.isNotEmpty(toplam)) {
+        if (StringUtils.isNotEmpty(kdv) && StringUtils.isNotEmpty(toplam) && kdv.length() > 2 && toplam.length() > 2) {
             tutar = String.valueOf(Integer.parseInt(toplam.replace(".", "")) -
                     Integer.parseInt(kdv.replace(".", "")));
-            tutar = tutar.substring(0, tutar.length() - 2) + "." + tutar.substring(tutar.length() - 2);
+            try {
+                tutar = tutar.substring(0, tutar.length() - 2) + "." + tutar.substring(tutar.length() - 2);
+            }
+            catch (StringIndexOutOfBoundsException sioobe) {
+                System.out.println("why do we have string index out of bounds exception? Tutar: " + tutar);
+            }
         }
 
         System.out.println("Tarih: " + tarih);
@@ -237,7 +294,7 @@ public class ReceiptServiceImpl implements ReceiptService {
     }
 
     private boolean isIntOrAccep(String st) {
-        Set<String> chs = Set.of(",", ".", " ", ":", "*", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9");
+        Set<String> chs = Set.of("/", ",", ".", " ", ":", "*", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9");
         for (int i = 0; i < st.length(); i++) {
             if(!chs.contains(st.substring(i, i+1))) {
                 return false;

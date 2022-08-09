@@ -71,9 +71,9 @@ public class OcrServiceImpl implements OcrService {
                     String text = annotation.getDescription();
                     BoundingPoly boundingPoly = annotation.getBoundingPoly();
 
-                    // System.out.format("Text: %s%n", text);
-                    // System.out.format("Position : %s%n", boundingPoly);
-                    // System.out.println("Topicality: " + annotation.getTopicality());
+                    System.out.format("Text: %s%n", text);
+                    System.out.format("Position : %s%n", boundingPoly);
+                    System.out.println("Topicality: " + annotation.getTopicality());
 
                     // in order to properly order the words, we put them and their properties to an ArrayList
                     TextModel word = new TextModel(text, boundingPoly);
@@ -89,7 +89,8 @@ public class OcrServiceImpl implements OcrService {
                 }
                 */
 
-
+                System.out.println(" Result of the initial image-to-text operation: ");
+                System.out.println(words.get(0).getText()); // print the full text
                 String orderedText = "";
                 // if (imageLabelSet.contains("Receipt") || imageLabelSet.contains("Font")) {
                 System.out.println("\n Since this image is analyzed to be a receipt," +
@@ -123,7 +124,8 @@ public class OcrServiceImpl implements OcrService {
                     textSoFar.append("\n");
                 }
 
-                // two string builders so that one inner for loop is enough.
+                // three string builders so that one inner for loop is enough.
+                StringBuilder textWayBeforeWord1 = new StringBuilder();
                 StringBuilder textBeforeWord1 = new StringBuilder();
                 StringBuilder textAfterWord1 = new StringBuilder();
                 String newWord = word1.getText();
@@ -136,35 +138,46 @@ public class OcrServiceImpl implements OcrService {
                     if (word2 != word1 && !removedWords.contains(word2) && word2.isCounterClockwiseFromTopLeft()) {
 
                         // if there exists words above this word that hasn't been added yet,
-                        // add it to the text before word1
+                        // add it to the text above word1
                         if (word2.getCenterY() <= word1.getY1() && word2.getCenterY() <= word1.getY2()) {
-                            textBeforeWord1.append(word2.getText());
+                            textWayBeforeWord1.append(word2.getText());
                             removedWords.add(word2);
-                            textBeforeWord1.append(" ");
+                            textWayBeforeWord1.append(" ");
                         }
 
                         // if there exists another word that is within the y-coordinate range of this word,
-                        // add it to the text after word1
+                        // add it to the text before or after word1 depending on that word's x coordinate.
                         if (word2.getCenterY() >= word1.getY1() && word2.getCenterY() <= word1.getY4()) {
 
-                            // if words are not close to each other, add a space in between
-                            if (word2.getX1() - word1.getX2() > 2) {
-                                textAfterWord1.append(" ");
+                            // if word2 is before word1
+                            if (word2.getX1() - word1.getX2() < 0) {
+                                textBeforeWord1.append(word2.getText());
+                                removedWords.add(word2);
+                                textBeforeWord1.append(" ");
                             }
-                            textAfterWord1.append(word2.getText());
-                            removedWords.add(word2);
 
-                            word1 = word2;
+                            // if word2 is after word1
+                            else if (word2.getX1() - word1.getX2() >= 0) {
+                                // if words are not close to each other, add a space in between
+                                if (word2.getX1() - word1.getX2() > 2) {
+                                    textAfterWord1.append(" ");
+                                }
+                                textAfterWord1.append(word2.getText());
+                                removedWords.add(word2);
+
+                                word1 = word2;
+                            }
                         }
                     }
                 }
 
                 // combine StringBuilders together to add these new words
-                textSoFar.append(textBeforeWord1);
+                textSoFar.append(textWayBeforeWord1);
                 // create an empty line before word1 as we don't want them to be next to each other.
-                if(!textBeforeWord1.toString().equals("")) {
+                if(!textWayBeforeWord1.toString().equals("")) {
                     textSoFar.append("\n");
                 }
+                textSoFar.append(textBeforeWord1);
                 textSoFar.append(newWord);
                 textSoFar.append(textAfterWord1);
             }

@@ -24,6 +24,8 @@ public class ImageController {
 
     private ReceiptService receiptService;
     private ExcelService excelService;
+    public final String INFO_FINDER_PATH = "src/main/resources/alternativeNames.csv";
+    public final String EXCEL_PATH = "src/main/resources/excels/VergilerTest6i.xlsx";
 
 
     @PostMapping("api/v1/ocr")
@@ -38,11 +40,11 @@ public class ImageController {
                 // for each text returned by GoogleVision (also improved with our algorithm),
                 // get important receipt information (such as tarih, vergi dairesi, kdv, toplam, etc.) in those receipts
                 Map<String, String> importantReceiptInfo = receiptService.getImportantReceiptInfo(orderedText,
-                        "src/main/resources/alternativeNames.csv");
+                        INFO_FINDER_PATH);
 
                 // then, put those important receipt information into an excel file
                 excelService.writeIntoExcelFile(importantReceiptInfo,
-                        "src/main/resources/excels/Vergiler4.xlsx");
+                        EXCEL_PATH);
             }
 
         } catch (IOException e) {
