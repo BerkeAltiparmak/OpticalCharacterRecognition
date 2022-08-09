@@ -5,23 +5,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="118c0ea7-2b80-4cc2-a688-6256de349354" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/solvia/solviavision/services/ExcelService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/solvia/solviavision/services/impl/ExcelServiceImpl.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/alternativeNames.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/static/index.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/templates/index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/solvia-vision.iml" beforeDir="false" afterPath="$PROJECT_DIR$/solvia-vision.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/solvia/solviavision/controllers/ImageController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/solvia/solviavision/controllers/ImageController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/solvia/solviavision/services/OcrService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/solvia/solviavision/services/OcrService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/solvia/solviavision/services/ReceiptService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/solvia/solviavision/services/ReceiptService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/solvia/solviavision/services/impl/OcrServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/solvia/solviavision/services/impl/OcrServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/solvia/solviavision/services/impl/ReceiptServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/solvia/solviavision/services/impl/ReceiptServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/solvia/solviavision/SolviaVisionApplicationTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/solvia/solviavision/SolviaVisionApplicationTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/excels/Vergiler2.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/excels/Vergiler2.xlsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/com/solvia/solviavision/controllers/ImageController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/solvia/solviavision/controllers/ImageController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/solvia/solviavision/services/OcrService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/solvia/solviavision/services/OcrService.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/solvia/solviavision/services/ReceiptService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/solvia/solviavision/services/ReceiptService.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/solvia/solviavision/services/impl/OcrServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/solvia/solviavision/services/impl/OcrServiceImpl.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/com/solvia/solviavision/services/impl/ReceiptServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/solvia/solviavision/services/impl/ReceiptServiceImpl.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/test-classes/com/solvia/solviavision/SolviaVisionApplicationTests.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/test-classes/com/solvia/solviavision/SolviaVisionApplicationTests.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

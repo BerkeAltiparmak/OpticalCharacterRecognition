@@ -27,7 +27,7 @@ public class ImageController {
 
 
     @PostMapping("api/v1/ocr")
-    public String getStringFromImages(@RequestParam("file") MultipartFile... imgs) {
+    public String getStringFromImages(@RequestParam("files") MultipartFile... imgs) {
         long start = System.currentTimeMillis();
         try {
             // get texts in all the images sent by the client.
@@ -42,7 +42,7 @@ public class ImageController {
 
                 // then, put those important receipt information into an excel file
                 excelService.writeIntoExcelFile(importantReceiptInfo,
-                        "src/main/resources/excels/Vergiler2.xlsx");
+                        "src/main/resources/excels/Vergiler4.xlsx");
             }
 
         } catch (IOException e) {
