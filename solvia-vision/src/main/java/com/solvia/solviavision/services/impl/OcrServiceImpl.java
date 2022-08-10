@@ -75,9 +75,9 @@ public class OcrServiceImpl implements OcrService {
                     String text = annotation.getDescription();
                     BoundingPoly boundingPoly = annotation.getBoundingPoly();
 
-                    System.out.format("Text: %s%n", text);
-                    System.out.format("Position : %s%n", boundingPoly);
-                    System.out.println("Topicality: " + annotation.getTopicality());
+                    // System.out.format("Text: %s%n", text);
+                    // System.out.format("Position : %s%n", boundingPoly);
+                    // System.out.println("Topicality: " + annotation.getTopicality());
 
                     // in order to properly order the words, we put them and their properties to an ArrayList
                     TextModel word = new TextModel(text, boundingPoly);
@@ -137,7 +137,7 @@ public class OcrServiceImpl implements OcrService {
                         // add it to the text before or after word1 depending on that word's x coordinate.
 
                         // if (word2.getCenterY() >= word1.getTopY() && word2.getCenterY() <= word1.getBottomY()) {
-                        if (mostBottomPointInTheLine - word2.getTopY() >= word2.getRangeY() / 3) {
+                        if (mostBottomPointInTheLine - word2.getTopY() >= word2.getRangeY() / 2) {
                             textsInTheSameLine.add(word2);
                             removedWords.add(word2);
                             mostBottomPointInTheLine = Math.max(word1.getBottomY(), word2.getBottomY());
@@ -147,12 +147,22 @@ public class OcrServiceImpl implements OcrService {
                 // for the texts that are in the same line (similar y-coordinates), sort them by their x-coordinates.
                 textsInTheSameLine.sort(Comparator.comparingInt(TextModel::getLeftX));
                 int mostRightPointInTheLine = 0;
+                int lastWordCharacterSize = -1;
                 for (TextModel inLineWord: textsInTheSameLine) {
                     textSoFar.append(inLineWord.getText());
                     // if there is some distance between the words, add a space in between.
+                    /*
+                    if (inLineWord.getLeftX() - mostRightPointInTheLine > lastWordCharacterSize
+                            && lastWordCharacterSize > 0) {
+                        textSoFar.append(" ".repeat(
+                                (inLineWord.getLeftX() - mostRightPointInTheLine) / lastWordCharacterSize));
+                    }
+                    else */
                     if (inLineWord.getRightX() - mostRightPointInTheLine > 2) {
                         textSoFar.append(" ");
                     }
+                    mostRightPointInTheLine = inLineWord.getRightX();
+                    lastWordCharacterSize = inLineWord.getRangeX() / inLineWord.getText().length();
                 }
                 textSoFar.append("\n");
             }

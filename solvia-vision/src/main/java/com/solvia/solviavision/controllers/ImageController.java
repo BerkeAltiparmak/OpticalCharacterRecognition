@@ -25,7 +25,7 @@ public class ImageController {
     private ReceiptService receiptService;
     private ExcelService excelService;
     public final String INFO_FINDER_PATH = "src/main/resources/alternativeNames.csv";
-    public final String EXCEL_PATH = "src/main/resources/excels/VergilerTest8.xlsx";
+    public final String EXCEL_PATH = "src/main/resources/excels/VergilerTest11.xlsx";
 
 
     @PostMapping("api/v1/ocr")
@@ -34,10 +34,12 @@ public class ImageController {
         try {
             // get texts in all the images sent by the client.
             List<String> orderedTextList = ocrService.convertImageToText(imgs);
+            long timeForImageToText = System.currentTimeMillis() - start;
+            System.out.println("Time to perform OCR operation: " + timeForImageToText);
 
             for (String orderedText: orderedTextList) {
 
-                // for each text returned by GoogleVision (also improved with our algorithm),
+                // for each text returned by GoogleVision (which is improved with our algorithm),
                 // get important receipt information (such as tarih, vergi dairesi, kdv, toplam, etc.) in those receipts
                 Map<String, String> importantReceiptInfo = receiptService.getImportantReceiptInfo(orderedText,
                         INFO_FINDER_PATH);
@@ -47,9 +49,14 @@ public class ImageController {
                         EXCEL_PATH);
             }
 
-        } catch (IOException e) {
+            long totalTime = (System.currentTimeMillis() - start);
+            System.out.println("Time it took to perform OCR, to extract important receipt information, " +
+                    "and to write it into an excel file: " + totalTime);
+        }
+        catch (IOException e) {
             throw new RuntimeException(e);
         }
+
         long time = (System.currentTimeMillis() - start);
         return String.valueOf(time);
 

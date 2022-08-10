@@ -7,12 +7,9 @@
     <list default="true" id="118c0ea7-2b80-4cc2-a688-6256de349354" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/solvia/solviavision/controllers/ImageController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/solvia/solviavision/controllers/ImageController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/solvia/solviavision/models/TextModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/solvia/solviavision/models/TextModel.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/solvia/solviavision/services/impl/OcrServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/solvia/solviavision/services/impl/OcrServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/excels/VergilerTest6i.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/excels/VergilerTest6i.xlsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/com/solvia/solviavision/controllers/ImageController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/solvia/solviavision/controllers/ImageController.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/com/solvia/solviavision/services/impl/OcrServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/solvia/solviavision/services/impl/OcrServiceImpl.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/solvia/solviavision/services/impl/ReceiptServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/solvia/solviavision/services/impl/ReceiptServiceImpl.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -130,5 +127,16 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/solvia/solviavision/services/impl/OcrServiceImpl.java</url>
+          <line>140</line>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>
