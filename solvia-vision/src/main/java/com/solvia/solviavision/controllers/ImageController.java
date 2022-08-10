@@ -25,7 +25,7 @@ public class ImageController {
     private ReceiptService receiptService;
     private ExcelService excelService;
     public final String INFO_FINDER_PATH = "src/main/resources/alternativeNames.csv";
-    public final String EXCEL_PATH = "src/main/resources/excels/VergilerTest6i.xlsx";
+    public final String EXCEL_PATH = "src/main/resources/excels/VergilerTest8.xlsx";
 
 
     @PostMapping("api/v1/ocr")

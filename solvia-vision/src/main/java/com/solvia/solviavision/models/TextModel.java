@@ -44,6 +44,26 @@ public class TextModel {
         return getRangeX() / 2 + x1;
     }
 
+    public int getTopY() {
+        return (y2 + y1) / 2;
+        // return Math.min(y1, y2);
+    }
+
+    public int getBottomY() {
+        return (y4 + y3) / 2;
+        // return Math.max(y3, y4);
+    }
+
+    public int getLeftX() {
+        return (x1 + x4) / 2;
+        // return Math.min(x1, x4);
+    }
+
+    public int getRightX() {
+        return (x2 + x3) / 2;
+        // return Math.max(x2, x3);
+    }
+
     public int getNeighbourLimitY() {
         return getRangeY() / 2;
     }

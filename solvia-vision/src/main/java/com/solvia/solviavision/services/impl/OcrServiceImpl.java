@@ -6,6 +6,7 @@ import com.solvia.solviavision.models.TextModel;
 import com.solvia.solviavision.services.OcrService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.w3c.dom.Text;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -13,6 +14,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -56,6 +59,7 @@ public class OcrServiceImpl implements OcrService {
             // full list of available annotations can be found at http://g.co/cloud/vision/docs
             List<TextModel> words = new ArrayList<>();
             // HashSet<String> imageLabelSet = new HashSet<>();
+
             for (AnnotateImageResponse res : responses) {
                 if (res.hasError()) {
                     System.out.format("Error: %s%n", res.getError().getMessage());
@@ -111,25 +115,17 @@ public class OcrServiceImpl implements OcrService {
         StringBuilder textSoFar = new StringBuilder();
         List<TextModel> removedWords = new ArrayList<>();
 
+        words.sort(Comparator.comparingInt(TextModel::getCenterY));
 
         // iterate through every word in the text in the order that GoogleVision captured
         for (TextModel word1: words) {
 
             // if the word is already written in the text or is not in the correct orientation, don't mind it
             if (!removedWords.contains(word1) && word1.isCounterClockwiseFromTopLeft()) {
-
-                // if it's out of the y-coordinate range of the previous word, make a line break,
-                // if it's not the first word
-                if (!textSoFar.toString().equals("")) {
-                    textSoFar.append("\n");
-                }
-
-                // three string builders so that one inner for loop is enough.
-                StringBuilder textWayBeforeWord1 = new StringBuilder();
-                StringBuilder textBeforeWord1 = new StringBuilder();
-                StringBuilder textAfterWord1 = new StringBuilder();
-                String newWord = word1.getText();
+                List<TextModel> textsInTheSameLine = new ArrayList<>();
+                textsInTheSameLine.add(word1);
                 removedWords.add(word1);
+                int mostBottomPointInTheLine = word1.getBottomY();
 
                 // iterate through every other word to compare other word's y-coordinates with word1
                 for (TextModel word2 : words) {
@@ -137,49 +133,28 @@ public class OcrServiceImpl implements OcrService {
                     // make sure the word is correctly orientated
                     if (word2 != word1 && !removedWords.contains(word2) && word2.isCounterClockwiseFromTopLeft()) {
 
-                        // if there exists words above this word that hasn't been added yet,
-                        // add it to the text above word1
-                        if (word2.getCenterY() <= word1.getY1() && word2.getCenterY() <= word1.getY2()) {
-                            textWayBeforeWord1.append(word2.getText());
-                            removedWords.add(word2);
-                            textWayBeforeWord1.append(" ");
-                        }
-
                         // if there exists another word that is within the y-coordinate range of this word,
                         // add it to the text before or after word1 depending on that word's x coordinate.
-                        if (word2.getCenterY() >= word1.getY1() && word2.getCenterY() <= word1.getY4()) {
 
-                            // if word2 is before word1
-                            if (word2.getX1() - word1.getX2() < 0) {
-                                textBeforeWord1.append(word2.getText());
-                                removedWords.add(word2);
-                                textBeforeWord1.append(" ");
-                            }
-
-                            // if word2 is after word1
-                            else if (word2.getX1() - word1.getX2() >= 0) {
-                                // if words are not close to each other, add a space in between
-                                if (word2.getX1() - word1.getX2() > 2) {
-                                    textAfterWord1.append(" ");
-                                }
-                                textAfterWord1.append(word2.getText());
-                                removedWords.add(word2);
-
-                                word1 = word2;
-                            }
+                        // if (word2.getCenterY() >= word1.getTopY() && word2.getCenterY() <= word1.getBottomY()) {
+                        if (mostBottomPointInTheLine - word2.getTopY() >= word2.getRangeY() / 3) {
+                            textsInTheSameLine.add(word2);
+                            removedWords.add(word2);
+                            mostBottomPointInTheLine = Math.max(word1.getBottomY(), word2.getBottomY());
                         }
                     }
                 }
-
-                // combine StringBuilders together to add these new words
-                textSoFar.append(textWayBeforeWord1);
-                // create an empty line before word1 as we don't want them to be next to each other.
-                if(!textWayBeforeWord1.toString().equals("")) {
-                    textSoFar.append("\n");
+                // for the texts that are in the same line (similar y-coordinates), sort them by their x-coordinates.
+                textsInTheSameLine.sort(Comparator.comparingInt(TextModel::getLeftX));
+                int mostRightPointInTheLine = 0;
+                for (TextModel inLineWord: textsInTheSameLine) {
+                    textSoFar.append(inLineWord.getText());
+                    // if there is some distance between the words, add a space in between.
+                    if (inLineWord.getRightX() - mostRightPointInTheLine > 2) {
+                        textSoFar.append(" ");
+                    }
                 }
-                textSoFar.append(textBeforeWord1);
-                textSoFar.append(newWord);
-                textSoFar.append(textAfterWord1);
+                textSoFar.append("\n");
             }
         }
 
