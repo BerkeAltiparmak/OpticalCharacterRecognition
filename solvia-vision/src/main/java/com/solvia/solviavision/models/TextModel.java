@@ -70,8 +70,9 @@ public class TextModel {
 
 
 
-    public boolean isCounterClockwiseFromTopLeft() {
+    public boolean hasCorrectOrientation() {
         return getX3() > getX1() && getX2() > getX1() &&
-                getY3() > getY1() && getY3() > getY2();
+                getY3() > getY1() && getY3() > getY2() &&
+                (text.length() == 1 || getRangeY() < getRangeX() * 2);
     }
 }

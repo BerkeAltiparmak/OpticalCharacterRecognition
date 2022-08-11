@@ -4,6 +4,7 @@ import com.google.cloud.vision.v1.*;
 import com.google.protobuf.ByteString;
 import com.solvia.solviavision.models.TextModel;
 import com.solvia.solviavision.services.OcrService;
+import org.apache.poi.ss.formula.functions.T;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.w3c.dom.Text;
@@ -13,17 +14,14 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public class OcrServiceImpl implements OcrService {
 
     @Override
-    public List<String> convertImageToText(MultipartFile... files) throws IOException {
+    public List<String> convertImageToText(List<MultipartFile> files) throws IOException {
         List<String> orderedTextList = new ArrayList<>();
 
         List<AnnotateImageRequest> requests = new ArrayList<>();
@@ -81,7 +79,7 @@ public class OcrServiceImpl implements OcrService {
 
                     // in order to properly order the words, we put them and their properties to an ArrayList
                     TextModel word = new TextModel(text, boundingPoly);
-                    if (word.isCounterClockwiseFromTopLeft()){
+                    if (word.hasCorrectOrientation() || words.isEmpty()) {
                         words.add(word);
                     }
                 }
@@ -113,25 +111,30 @@ public class OcrServiceImpl implements OcrService {
 
     public String orderReceiptText(List<TextModel> words) {
         StringBuilder textSoFar = new StringBuilder();
-        List<TextModel> removedWords = new ArrayList<>();
 
         words.sort(Comparator.comparingInt(TextModel::getCenterY));
+        int wordsSize = words.size();
 
         // iterate through every word in the text in the order that GoogleVision captured
-        for (TextModel word1: words) {
+        for (int i = 0; i < wordsSize; i ++) {
+            TextModel word1 = words.get(i);
 
             // if the word is already written in the text or is not in the correct orientation, don't mind it
-            if (!removedWords.contains(word1) && word1.isCounterClockwiseFromTopLeft()) {
+            if (word1.hasCorrectOrientation()) {
                 List<TextModel> textsInTheSameLine = new ArrayList<>();
                 textsInTheSameLine.add(word1);
-                removedWords.add(word1);
+                words.remove(i);
+                i--;
+                wordsSize--;
+
                 int mostBottomPointInTheLine = word1.getBottomY();
 
                 // iterate through every other word to compare other word's y-coordinates with word1
-                for (TextModel word2 : words) {
+                for (int j = 0; j < wordsSize; j++) {
+                    TextModel word2 = words.get(j);
 
                     // make sure the word is correctly orientated
-                    if (word2 != word1 && !removedWords.contains(word2) && word2.isCounterClockwiseFromTopLeft()) {
+                    if (word2.hasCorrectOrientation()) {
 
                         // if there exists another word that is within the y-coordinate range of this word,
                         // add it to the text before or after word1 depending on that word's x coordinate.
@@ -139,30 +142,26 @@ public class OcrServiceImpl implements OcrService {
                         // if (word2.getCenterY() >= word1.getTopY() && word2.getCenterY() <= word1.getBottomY()) {
                         if (mostBottomPointInTheLine - word2.getTopY() >= word2.getRangeY() / 2) {
                             textsInTheSameLine.add(word2);
-                            removedWords.add(word2);
-                            mostBottomPointInTheLine = Math.max(word1.getBottomY(), word2.getBottomY());
+                            words.remove(j);
+                            j--;
+                            wordsSize--;
+
+                            mostBottomPointInTheLine = Math.max(mostBottomPointInTheLine, word2.getBottomY());
+                        }
+                        else {
+                            break;
                         }
                     }
                 }
                 // for the texts that are in the same line (similar y-coordinates), sort them by their x-coordinates.
                 textsInTheSameLine.sort(Comparator.comparingInt(TextModel::getLeftX));
                 int mostRightPointInTheLine = 0;
-                int lastWordCharacterSize = -1;
                 for (TextModel inLineWord: textsInTheSameLine) {
                     textSoFar.append(inLineWord.getText());
-                    // if there is some distance between the words, add a space in between.
-                    /*
-                    if (inLineWord.getLeftX() - mostRightPointInTheLine > lastWordCharacterSize
-                            && lastWordCharacterSize > 0) {
-                        textSoFar.append(" ".repeat(
-                                (inLineWord.getLeftX() - mostRightPointInTheLine) / lastWordCharacterSize));
-                    }
-                    else */
                     if (inLineWord.getRightX() - mostRightPointInTheLine > 2) {
                         textSoFar.append(" ");
                     }
                     mostRightPointInTheLine = inLineWord.getRightX();
-                    lastWordCharacterSize = inLineWord.getRangeX() / inLineWord.getText().length();
                 }
                 textSoFar.append("\n");
             }

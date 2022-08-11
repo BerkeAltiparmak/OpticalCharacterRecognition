@@ -7,6 +7,6 @@ import java.io.IOException;
 import java.util.List;
 
 public interface OcrService {
-   List<String> convertImageToText(MultipartFile... fl) throws IOException;
+   List<String> convertImageToText(List<MultipartFile> fl) throws IOException;
    String orderReceiptText(List<TextModel> words);
 }
